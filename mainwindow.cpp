@@ -15,19 +15,19 @@ MainWindow::MainWindow(QWidget *parent)
   QPushButton *btnPass = new QPushButton(this);
   btnPass->setText("passed");
   connect(btnPass, &QPushButton::released, this,
-          [this]() { server->sendMsg("pass"); });
+          [this]() { server->sendMsg("passed"); });
   btnRow->addWidget(btnPass);
 
   QPushButton *btnSkip = new QPushButton(this);
   btnSkip->setText("skip");
   connect(btnSkip, &QPushButton::released, this,
-          [this]() { server->sendMsg("skip"); });
+          [this]() { server->sendMsg("skipped"); });
   btnRow->addWidget(btnSkip);
 
   QPushButton *btnFail = new QPushButton(this);
   btnFail->setText("failed");
   connect(btnFail, &QPushButton::released, this,
-          [this]() { server->sendMsg("fail"); });
+          [this]() { server->sendMsg("failed"); });
   btnRow->addWidget(btnFail);
 
   col->addItem(btnRow);
@@ -37,17 +37,6 @@ MainWindow::MainWindow(QWidget *parent)
   ui->centralwidget->show();
 
   server = new Server(lblNameTest);
-  server->serialWrite("killall msTest\n");
-  server->serialWrite("dd if=/dev/zero of=/dev/fb0\n");
-  server->serialWrite(
-      "date +%D -s " +
-      QDateTime::currentDateTime().toString("MM/dd/yyyy").toStdString() + "\n");
-  server->serialWrite(
-      "date +%T -s " +
-      QDateTime::currentDateTime().toString("hh:mm:ss").toStdString() + "\n");
-  server->serialWrite("/usr/bin/./msTest " + server->getServerAddress() +
-                      " & \n");
-  //  serialWrite("ifconfig eth0 192.168.0.1 255.255.255.0"); // from gui
 
   qDebug() << "starting server";
 }

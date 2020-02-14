@@ -12,6 +12,7 @@
 #include <QtWebSockets/QtWebSockets>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 class Server : public QObject {
 public:
@@ -20,10 +21,12 @@ public:
   void serialWrite(std::string);
   std::string getServerAddress();
   void sendMsg(QString msg);
+  void log(int value);
 
 private:
   QWebSocketServer *server;
   QWebSocket *client;
+  std::ofstream file;
 
 private Q_SLOTS:
   void onNewConnection();

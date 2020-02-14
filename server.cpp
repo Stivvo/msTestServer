@@ -12,9 +12,13 @@ Server::Server(QLabel *lbl) {
     qDebug() << "NOT ";
   }
   qDebug() << "listening for client on 8080\n";
-  phases = {"home", "start", "touch", "brightness", "end"};
-  currentPhase = 0;
+  phases = {"start", "touch", "brightness", "end", "finished"};
   this->lbl = lbl;
+
+  currentPhase = 0;
+  lbl->setText(phases.at(currentPhase));
+  lbl->update();
+  lbl->repaint();
 }
 
 Server::~Server() { server->disconnect(); }
@@ -41,14 +45,40 @@ void Server::processMsg(QString msg) {
 }
 
 void Server::sendMsg(QString msg) {
-  client->sendTextMessage(msg);
-  qDebug() << "send: " << msg;
-  qDebug() << "phase: " << phases.at(currentPhase);
-  lbl->setText(phases.at(currentPhase++));
+  lbl->setText(phases.at(currentPhase));
   lbl->update();
   lbl->repaint();
+
+  file << phases.at(currentPhase).toStdString() << " " << msg.toStdString() << std::endl;
   // può cambiare il normale ordine, se ad esempio clicco tutti i bottoni
   // currentphase va avanti e il client fa fare l'avanzamento di fase sul server
+
+  if (currentPhase == 0) {
+      file.open("/tmp/msTest/" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss").toStdString() + ".txt");
+      file << "test started\n";
+
+      serialWrite("killall msTest\n");
+      serialWrite("dd if=/dev/zero of=/dev/fb0\n");
+      serialWrite(
+          "date +%D -s " +
+          QDateTime::currentDateTime().toString("MM/dd/yyyy").toStdString() + "\n");
+      serialWrite(
+          "date +%T -s " +
+          QDateTime::currentDateTime().toString("hh:mm:ss").toStdString() + "\n");
+      serialWrite("/usr/bin/./msTest " + getServerAddress() +
+                          " & \n");
+      //  serialWrite("ifconfig eth0 192.168.0.1 255.255.255.0"); // from gui
+  } else {
+      client->sendTextMessage(msg);
+
+      if (currentPhase == phases.size() - 2) {
+          file.close();
+          serialWrite("dd if=/dev/zero of=/dev/fb0\n");
+      }
+  }
+  if (currentPhase != phases.size() - 1)
+    currentPhase++;
+//  else close window?
 }
 
 void Server::serialWrite(std::string cmd) {
