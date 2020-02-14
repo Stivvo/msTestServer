@@ -12,10 +12,9 @@ Server::Server(QLabel *lbl) {
     qDebug() << "NOT ";
   }
   qDebug() << "listening for client on 8080\n";
-  phases = {"touch", "brightness", "end"};
+  phases = {"home", "start", "touch", "brightness", "end"};
   currentPhase = 0;
   this->lbl = lbl;
-  lbl->setText(phases.at(0));
 }
 
 Server::~Server() { server->disconnect(); }
@@ -35,12 +34,19 @@ void Server::onNewConnection() {
 
 void Server::processMsg(QString msg) {
   qDebug() << "received" << msg;
+  qDebug() << "phase: " << phases.at(currentPhase);
   lbl->setText(phases.at(currentPhase++));
+  lbl->update();
+  lbl->repaint();
 }
 
 void Server::sendMsg(QString msg) {
   client->sendTextMessage(msg);
   qDebug() << "send: " << msg;
+  qDebug() << "phase: " << phases.at(currentPhase);
+  lbl->setText(phases.at(currentPhase++));
+  lbl->update();
+  lbl->repaint();
   // può cambiare il normale ordine, se ad esempio clicco tutti i bottoni
   // currentphase va avanti e il client fa fare l'avanzamento di fase sul server
 }
