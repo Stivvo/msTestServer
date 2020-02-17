@@ -12,7 +12,7 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
     qDebug() << "NOT ";
   }
   qDebug() << "listening for client on 8080\n";
-  phases = {"start", "touch", "brightness", "usb", "end", "finished"};
+  phases = {"start", "touch", "brightness", "usb", "red", "green", "blue", "end", "finished"};
   this->lbl = lbl;
   this->lblEvent = lblEvent;
   this->lblNtested = lblNtested;
