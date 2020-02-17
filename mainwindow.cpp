@@ -12,6 +12,10 @@ MainWindow::MainWindow(QWidget *parent)
   QLabel *lblNameTest = new QLabel(this);
   col->addWidget(lblNameTest);
 
+  QLabel *lblUsb = new QLabel(this);
+  lblUsb->setVisible(false);
+  col->addWidget(lblUsb);
+
   QPushButton *btnPrev = new QPushButton(this);
   btnPrev->setText("go back");
   connect(btnPrev, &QPushButton::released, this,
@@ -42,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
   this->setCentralWidget(ui->centralwidget);
   ui->centralwidget->show();
 
-  server = new Server(lblNameTest);
+  server = new Server(lblNameTest, lblUsb);
 
   qDebug() << "starting server";
 }

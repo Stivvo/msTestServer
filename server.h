@@ -16,7 +16,7 @@
 
 class Server : public QObject {
 public:
-  Server(QLabel *lbl);
+  Server(QLabel *lbl, QLabel *lblUsb);
   ~Server();
   void serialWrite(std::string);
   std::string getServerAddress();
@@ -34,6 +34,7 @@ private Q_SLOTS:
   std::vector<QString> phases;
   int currentPhase;
   QLabel *lbl;
+  QLabel *lblUsb;
 };
 
 #endif // SERVER_H

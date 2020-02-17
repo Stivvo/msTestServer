@@ -1,6 +1,6 @@
 #include "server.h"
 
-Server::Server(QLabel *lbl) {
+Server::Server(QLabel *lbl, QLabel *lblUsb) {
   server = new QWebSocketServer(QString("msTestServer"),
                                 QWebSocketServer::NonSecureMode);
 
@@ -14,6 +14,7 @@ Server::Server(QLabel *lbl) {
   qDebug() << "listening for client on 8080\n";
   phases = {"start", "touch", "brightness", "usb", "end", "finished"};
   this->lbl = lbl;
+  this->lblUsb = lblUsb;
 
   currentPhase = 0;
   lbl->setText(phases.at(currentPhase));
@@ -37,11 +38,19 @@ void Server::onNewConnection() {
 // il server manda il numero + passato/skip/fallito del test appena concluso
 
 void Server::processMsg(QString msg) {
-  qDebug() << "received" << msg;
-  qDebug() << "phase: " << phases.at(currentPhase);
-  lbl->setText(phases.at(currentPhase++));
-  lbl->update();
-  lbl->repaint();
+    qDebug() << "received" << msg;
+    qDebug() << "phase: " << phases.at(currentPhase);
+
+    if (msg.contains("usb")) {
+        lblUsb->setText(msg);
+        lblUsb->setVisible(true);
+        lblUsb->repaint();
+    } else {
+        lblUsb->setVisible(false);
+        lbl->setText(phases.at(currentPhase++));
+        lbl->update();
+        lbl->repaint();
+     }
 }
 
 void Server::sendMsg(QString msg) {
