@@ -12,6 +12,12 @@ MainWindow::MainWindow(QWidget *parent)
   QLabel *lblNameTest = new QLabel(this);
   col->addWidget(lblNameTest);
 
+  QPushButton *btnPrev = new QPushButton(this);
+  btnPrev->setText("go back");
+  connect(btnPrev, &QPushButton::released, this,
+          [this]() { server->sendMsg("passed"); });
+  btnRow->addWidget(btnPrev);
+
   QPushButton *btnPass = new QPushButton(this);
   btnPass->setText("passed");
   connect(btnPass, &QPushButton::released, this,

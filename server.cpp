@@ -12,7 +12,7 @@ Server::Server(QLabel *lbl) {
     qDebug() << "NOT ";
   }
   qDebug() << "listening for client on 8080\n";
-  phases = {"start", "touch", "brightness", "end", "finished"};
+  phases = {"start", "touch", "brightness", "usb", "end", "finished"};
   this->lbl = lbl;
 
   currentPhase = 0;
@@ -110,5 +110,5 @@ std::string Server::getServerAddress() {
   socket.connectToHost("8.8.8.8", 53); // google DNS
   return socket.waitForConnected()
              ? socket.localAddress().toString().toStdString()
-             : "ws://localhost:8080";
+             : "localhost";
 }
