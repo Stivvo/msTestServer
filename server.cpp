@@ -30,7 +30,11 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
   lbl->repaint();
 }
 
-Server::~Server() { server->disconnect(); }
+Server::~Server() {
+    file.close();
+    server->disconnect();
+    client->close();
+}
 
 void Server::onNewConnection() {
   client = server->nextPendingConnection();
@@ -46,7 +50,6 @@ void Server::onNewConnection() {
 void Server::sendMsg(QString msg) {
 
     if (currentPhase >= phases.size()) {
-//        serialWrite("dd if=/dev/zero of=/dev/fb0\n");
         return;
     }
 
@@ -72,13 +75,10 @@ void Server::sendMsg(QString msg) {
   } else {
         client->sendTextMessage(msg);
       if (currentPhase == phases.size() - 1) {
-          file.close();
-          server->disconnect();
-          client->close();
           serialWrite("dd if=/dev/zero of=/dev/fb0\n");
       }
   }
-  log(msg);
+  advance(msg);
 }
 
 void Server::processMsg(QString msg) {
@@ -87,17 +87,6 @@ void Server::processMsg(QString msg) {
 
     if (msg.contains("usb")) {
         lblEvent->setText(msg);
-
-        // se una chiavetta ha n partizioni usbwatcher manda n segnali
-        // quindi faccio in modo che usnTestedCount venga incrementato solo
-        // dopo che la chiavetta è stata rimossa
-        // questo rende impossibile il test se si inseriscono più chiavette contemporaneamente
-
-        // non ho ancora trovato il modo di dare a Server il nome della usb montata
-        // (sarebbe il parametro qstring del signal)
-        // in modo da scartare tutti i nomi che non contengono numeri
-        // (quindi considerare /dev/sda e non /dev/sda1 per esempio)
-
         if (msg == "usb added" && usbRemoved) {
             usbTestedCount++;
             usbRemoved = false;
@@ -113,7 +102,7 @@ void Server::processMsg(QString msg) {
         showLabels(true);
     } else {
         showLabels(false);
-        log(msg);
+        advance(msg);
      }
 }
 
@@ -124,7 +113,7 @@ void Server::showLabels(bool visible) {
     lblNtested->repaint();
 }
 
-void Server::log(QString msg) {
+void Server::advance(QString msg) {
 
   if (currentPhase < phases.size()) {
       file << phases.at(currentPhase).toStdString() << " " << msg.toStdString() << std::endl;

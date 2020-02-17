@@ -23,7 +23,7 @@ public:
   void sendMsg(QString msg);
 
   void serialWrite(std::string);
-  void log(QString msg);
+  void advance(QString msg);
   void showLabels(bool visible);
 
 private:
