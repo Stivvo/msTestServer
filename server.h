@@ -16,7 +16,7 @@
 
 class Server : public QObject {
 public:
-  Server(QLabel *lbl, QLabel *lblUsb);
+  Server(QLabel *lbl, QLabel *lblUsb, QLabel *lblUsbTested);
   ~Server();
   void serialWrite(std::string);
   std::string getServerAddress();
@@ -28,13 +28,18 @@ private:
   QWebSocket *client;
   std::ofstream file;
 
+  int nrUsbTested;
+  int nrUsb;
+  std::vector<QString> phases;
+  int currentPhase;
+
+  QLabel *lbl;
+  QLabel *lblUsb;
+  QLabel *lblUsbTested;
+
 private Q_SLOTS:
   void onNewConnection();
   void processMsg(QString msg);
-  std::vector<QString> phases;
-  int currentPhase;
-  QLabel *lbl;
-  QLabel *lblUsb;
-};
+}
 
 #endif // SERVER_H

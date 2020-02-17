@@ -1,6 +1,7 @@
 #include "server.h"
 
-Server::Server(QLabel *lbl, QLabel *lblUsb) {
+Server::Server(QLabel *lbl, QLabel *lblUsb, QLabel *lblUsbTested) {
+
   server = new QWebSocketServer(QString("msTestServer"),
                                 QWebSocketServer::NonSecureMode);
 
@@ -15,11 +16,15 @@ Server::Server(QLabel *lbl, QLabel *lblUsb) {
   phases = {"start", "touch", "brightness", "usb", "end", "finished"};
   this->lbl = lbl;
   this->lblUsb = lblUsb;
+  this->lblUsbTested = lblUsbTested;
 
   currentPhase = 0;
   lbl->setText(phases.at(currentPhase));
   lbl->update();
   lbl->repaint();
+
+  nrUsb = 4;
+  nrUsbTested = 0;
 }
 
 Server::~Server() { server->disconnect(); }
@@ -45,8 +50,19 @@ void Server::processMsg(QString msg) {
         lblUsb->setText(msg);
         lblUsb->setVisible(true);
         lblUsb->repaint();
+
+        if (msg == "usb added") {
+            nrUsbTested++;
+
+            lblUsbTested->setText(QString::fromStdString(
+                "tested: " + std::to_string(nrUsbTested) + "/" + std::to_string(nrUsb)));
+            lblUsbTested->setVisible(true);
+            lblUsbTested->repaint();
+        }
     } else {
         lblUsb->setVisible(false);
+        lblUsbTested->setVisible(false);
+
         lbl->setText(phases.at(currentPhase++));
         lbl->update();
         lbl->repaint();
@@ -121,3 +137,4 @@ std::string Server::getServerAddress() {
              ? socket.localAddress().toString().toStdString()
              : "localhost";
 }
+
