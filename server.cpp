@@ -4,10 +4,10 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
   server = new QWebSocketServer(QString("msTestServer"),
                                 QWebSocketServer::NonSecureMode);
 
-  qDebug() << "starting server";
   if (server->listen(QHostAddress::Any, 8080)) {
     connect(server, &QWebSocketServer::newConnection, this,
             &Server::onNewConnection);
+      qDebug() << "starting server";
   } else {
     qDebug() << "NOT ";
   }
@@ -21,6 +21,9 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
   usbTestedCount = 0;
   usbCount = 4;
 
+  btnPressedCount = 0;
+  btnCount = 12;
+
   currentPhase = 0;
   lbl->setText(phases.at(currentPhase));
   lbl->update();
@@ -31,6 +34,7 @@ Server::~Server() { server->disconnect(); }
 
 void Server::onNewConnection() {
   client = server->nextPendingConnection();
+  qDebug() << client->errorString();
 
   connect(client, &QWebSocket::textMessageReceived, this, &Server::processMsg);
   connect(client, &QWebSocket::disconnected, this, [this]() {
@@ -39,19 +43,50 @@ void Server::onNewConnection() {
   });
 }
 
-// di norma:
-// il server manda il numero + passato/skip/fallito del test appena concluso
+void Server::sendMsg(QString msg) {
+
+    if (currentPhase >= phases.size()) {
+//        serialWrite("dd if=/dev/zero of=/dev/fb0\n");
+        return;
+    }
+
+    showLabels(false);
+
+  // può cambiare il normale ordine, se ad esempio clicco tutti i bottoni
+  // currentphase va avanti e il client fa fare l'avanzamento di fase sul server
+
+  if (currentPhase == 0) { // la prima volta non invia nulla al client ma lo fa partire
+      file.open("/tmp/msTest/" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss").toStdString() + ".txt");
+
+      serialWrite("killall msTest\n");
+      serialWrite("dd if=/dev/zero of=/dev/fb0\n");
+      serialWrite(
+          "date +%D -s " +
+          QDateTime::currentDateTime().toString("MM/dd/yyyy").toStdString() + "\n");
+      serialWrite(
+          "date +%T -s " +
+          QDateTime::currentDateTime().toString("hh:mm:ss").toStdString() + "\n");
+      serialWrite("/usr/bin/./msTest " + getServerAddress() +
+                          " & \n");
+      //  serialWrite("ifconfig eth0 192.168.0.1 255.255.255.0"); // from gui
+  } else {
+        client->sendTextMessage(msg);
+      if (currentPhase == phases.size() - 1) {
+          file.close();
+          server->disconnect();
+          client->close();
+          serialWrite("dd if=/dev/zero of=/dev/fb0\n");
+      }
+  }
+  log(msg);
+}
 
 void Server::processMsg(QString msg) {
     qDebug() << "received" << msg;
     qDebug() << "phase: " << phases.at(currentPhase);
 
-    qDebug() << "1count" << usbTestedCount << "/" << usbCount;
-
     if (msg.contains("usb")) {
         lblEvent->setText(msg);
-        lblEvent->setVisible(true);
-        lblEvent->repaint();
 
         // se una chiavetta ha n partizioni usbwatcher manda n segnali
         // quindi faccio in modo che usnTestedCount venga incrementato solo
@@ -67,60 +102,37 @@ void Server::processMsg(QString msg) {
             usbTestedCount++;
             usbRemoved = false;
             lblNtested->setText(QString("tested: %1/%2").arg(usbTestedCount / 1).arg(usbCount));
-            lblNtested->setVisible(true);
-            lblNtested->repaint();
         } else if (msg == "usb removed")
             usbRemoved = true;
-    } else {
-        lblEvent->setVisible(false);
-        lblNtested->setVisible(false);
-        lblEvent->repaint();
-        lblNtested->repaint();
 
-        lbl->setText(phases.at(currentPhase++));
-        lbl->update();
-        lbl->repaint();
+        showLabels(true);
+    } else if (msg == "button pressed") {
+        btnPressedCount++;
+        lblEvent->setText(msg);
+        lblNtested->setText(QString("pressed: %1/%2").arg(btnPressedCount).arg(btnCount));
+        showLabels(true);
+    } else {
+        showLabels(false);
+        log(msg);
      }
-    qDebug() << "2count" << usbTestedCount << "/" << usbCount;
 }
 
-void Server::sendMsg(QString msg) {
-  lbl->setText(phases.at(currentPhase));
-  lbl->update();
-  lbl->repaint();
+void Server::showLabels(bool visible) {
+    lblEvent->setVisible(visible);
+    lblNtested->setVisible(visible);
+    lblEvent->repaint();
+    lblNtested->repaint();
+}
 
-  file << phases.at(currentPhase).toStdString() << " " << msg.toStdString() << std::endl;
-  // può cambiare il normale ordine, se ad esempio clicco tutti i bottoni
-  // currentphase va avanti e il client fa fare l'avanzamento di fase sul server
+void Server::log(QString msg) {
 
-  if (currentPhase == 0) {
-      file.open("/tmp/msTest/" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss").toStdString() + ".txt");
-      file << "test started\n";
+  if (currentPhase < phases.size()) {
+      file << phases.at(currentPhase).toStdString() << " " << msg.toStdString() << std::endl;
 
-      serialWrite("killall msTest\n");
-      serialWrite("dd if=/dev/zero of=/dev/fb0\n");
-      serialWrite(
-          "date +%D -s " +
-          QDateTime::currentDateTime().toString("MM/dd/yyyy").toStdString() + "\n");
-      serialWrite(
-          "date +%T -s " +
-          QDateTime::currentDateTime().toString("hh:mm:ss").toStdString() + "\n");
-      serialWrite("/usr/bin/./msTest " + getServerAddress() +
-                          " & \n");
-      //  serialWrite("ifconfig eth0 192.168.0.1 255.255.255.0"); // from gui
-  } else {
-      client->sendTextMessage(msg);
-
-      if (currentPhase >= phases.size() - 2) {
-          file.close();
-          server->disconnect();
-          client->close();
-          serialWrite("dd if=/dev/zero of=/dev/fb0\n");
-      }
+      lbl->setText(phases.at(currentPhase));
+      currentPhase++;
+      lbl->repaint();
   }
-  if (currentPhase != phases.size() - 1)
-    currentPhase++;
-//  else close window?
 }
 
 void Server::serialWrite(std::string cmd) {

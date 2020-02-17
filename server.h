@@ -23,7 +23,8 @@ public:
   void sendMsg(QString msg);
 
   void serialWrite(std::string);
-  void log(int value);
+  void log(QString msg);
+  void showLabels(bool visible);
 
 private:
   QWebSocketServer *server;
@@ -36,6 +37,9 @@ private:
   bool usbRemoved;
   int usbTestedCount;
   int usbCount;
+
+  int btnPressedCount;
+  int btnCount;
 
   QLabel *lbl;
   QLabel *lblEvent;
