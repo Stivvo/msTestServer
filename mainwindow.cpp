@@ -7,18 +7,19 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
 
   QLayout *col = new QVBoxLayout();
+  QLayout *lblRow = new QHBoxLayout();
   QLayout *btnRow = new QHBoxLayout();
 
   QLabel *lblNameTest = new QLabel(this);
-  col->addWidget(lblNameTest);
+  lblRow->addWidget(lblNameTest);
 
-  QLabel *lblUsb = new QLabel(this);
-  lblUsb->setVisible(false);
-  col->addWidget(lblUsb);
+  QLabel *lblEvent = new QLabel(this);
+  lblEvent->setVisible(false);
+  lblRow->addWidget(lblEvent);
 
-  QLabel *lblUsbTested = new QLabel(this);
-  lblUsbTested->setVisible(false);
-  col->addWidget(lblUsbTested);
+  QLabel *lblNtested = new QLabel(this);
+  lblNtested->setVisible(false);
+  lblRow->addWidget(lblNtested);
 
   QPushButton *btnPrev = new QPushButton(this);
   btnPrev->setText("go back");
@@ -44,13 +45,14 @@ MainWindow::MainWindow(QWidget *parent)
           [this]() { server->sendMsg("failed"); });
   btnRow->addWidget(btnFail);
 
+  col->addItem(lblRow);
   col->addItem(btnRow);
 
   ui->centralwidget->setLayout(col);
   this->setCentralWidget(ui->centralwidget);
   ui->centralwidget->show();
 
-  server = new Server(lblNameTest, lblUsb, lblUsbTested);
+  server = new Server(lblNameTest, lblEvent, lblNtested);
 
   qDebug() << "starting server";
 }

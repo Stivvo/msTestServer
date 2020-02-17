@@ -1,6 +1,6 @@
 #include "server.h"
 
-Server::Server(QLabel *lbl, QLabel *lblUsb, QLabel *lblUsbTested) {
+Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
   server = new QWebSocketServer(QString("msTestServer"),
                                 QWebSocketServer::NonSecureMode);
 
@@ -14,8 +14,8 @@ Server::Server(QLabel *lbl, QLabel *lblUsb, QLabel *lblUsbTested) {
   qDebug() << "listening for client on 8080\n";
   phases = {"start", "touch", "brightness", "usb", "end", "finished"};
   this->lbl = lbl;
-  this->lblUsb = lblUsb;
-  this->lblUsbTested = lblUsbTested;
+  this->lblEvent = lblEvent;
+  this->lblNtested = lblNtested;
 
   usbRemoved = true;
   usbTestedCount = 0;
@@ -49,9 +49,9 @@ void Server::processMsg(QString msg) {
     qDebug() << "1count" << usbTestedCount << "/" << usbCount;
 
     if (msg.contains("usb")) {
-        lblUsb->setText(msg);
-        lblUsb->setVisible(true);
-        lblUsb->repaint();
+        lblEvent->setText(msg);
+        lblEvent->setVisible(true);
+        lblEvent->repaint();
 
         // se una chiavetta ha n partizioni usbwatcher manda n segnali
         // quindi faccio in modo che usnTestedCount venga incrementato solo
@@ -66,16 +66,16 @@ void Server::processMsg(QString msg) {
         if (msg == "usb added" && usbRemoved) {
             usbTestedCount++;
             usbRemoved = false;
-            lblUsbTested->setText(QString("tested: %1/%2").arg(usbTestedCount / 1).arg(usbCount));
-            lblUsbTested->setVisible(true);
-            lblUsbTested->repaint();
+            lblNtested->setText(QString("tested: %1/%2").arg(usbTestedCount / 1).arg(usbCount));
+            lblNtested->setVisible(true);
+            lblNtested->repaint();
         } else if (msg == "usb removed")
             usbRemoved = true;
     } else {
-        lblUsb->setVisible(false);
-        lblUsbTested->setVisible(false);
-        lblUsb->repaint();
-        lblUsbTested->repaint();
+        lblEvent->setVisible(false);
+        lblNtested->setVisible(false);
+        lblEvent->repaint();
+        lblNtested->repaint();
 
         lbl->setText(phases.at(currentPhase++));
         lbl->update();
