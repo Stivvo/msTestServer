@@ -27,19 +27,18 @@ private:
   QWebSocketServer *server;
   QWebSocket *client;
   std::ofstream file;
-
-  int nrUsbTested;
-  int nrUsb;
-  std::vector<QString> phases;
-  int currentPhase;
-
-  QLabel *lbl;
-  QLabel *lblUsb;
-  QLabel *lblUsbTested;
+  bool usbRemoved;
 
 private Q_SLOTS:
   void onNewConnection();
   void processMsg(QString msg);
-}
+  std::vector<QString> phases;
+  int currentPhase;
+  int usbTestedCount;
+  int usbCount;
+  QLabel *lbl;
+  QLabel *lblUsb;
+  QLabel *lblUsbTested;
+};
 
 #endif // SERVER_H

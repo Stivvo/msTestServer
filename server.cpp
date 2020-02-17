@@ -1,7 +1,6 @@
 #include "server.h"
 
 Server::Server(QLabel *lbl, QLabel *lblUsb, QLabel *lblUsbTested) {
-
   server = new QWebSocketServer(QString("msTestServer"),
                                 QWebSocketServer::NonSecureMode);
 
@@ -18,13 +17,14 @@ Server::Server(QLabel *lbl, QLabel *lblUsb, QLabel *lblUsbTested) {
   this->lblUsb = lblUsb;
   this->lblUsbTested = lblUsbTested;
 
+  usbRemoved = true;
+  usbTestedCount = 0;
+  usbCount = 4;
+
   currentPhase = 0;
   lbl->setText(phases.at(currentPhase));
   lbl->update();
   lbl->repaint();
-
-  nrUsb = 4;
-  nrUsbTested = 0;
 }
 
 Server::~Server() { server->disconnect(); }
@@ -46,27 +46,42 @@ void Server::processMsg(QString msg) {
     qDebug() << "received" << msg;
     qDebug() << "phase: " << phases.at(currentPhase);
 
+    qDebug() << "1count" << usbTestedCount << "/" << usbCount;
+
     if (msg.contains("usb")) {
         lblUsb->setText(msg);
         lblUsb->setVisible(true);
         lblUsb->repaint();
 
-        if (msg == "usb added") {
-            nrUsbTested++;
+        // se una chiavetta ha n partizioni usbwatcher manda n segnali
+        // quindi faccio in modo che usnTestedCount venga incrementato solo
+        // dopo che la chiavetta è stata rimossa
+        // questo rende impossibile il test se si inseriscono più chiavette contemporaneamente
 
-            lblUsbTested->setText(QString::fromStdString(
-                "tested: " + std::to_string(nrUsbTested) + "/" + std::to_string(nrUsb)));
+        // non ho ancora trovato il modo di dare a Server il nome della usb montata
+        // (sarebbe il parametro qstring del signal)
+        // in modo da scartare tutti i nomi che non contengono numeri
+        // (quindi considerare /dev/sda e non /dev/sda1 per esempio)
+
+        if (msg == "usb added" && usbRemoved) {
+            usbTestedCount++;
+            usbRemoved = false;
+            lblUsbTested->setText(QString("tested: %1/%2").arg(usbTestedCount / 1).arg(usbCount));
             lblUsbTested->setVisible(true);
             lblUsbTested->repaint();
-        }
+        } else if (msg == "usb removed")
+            usbRemoved = true;
     } else {
         lblUsb->setVisible(false);
         lblUsbTested->setVisible(false);
+        lblUsb->repaint();
+        lblUsbTested->repaint();
 
         lbl->setText(phases.at(currentPhase++));
         lbl->update();
         lbl->repaint();
      }
+    qDebug() << "2count" << usbTestedCount << "/" << usbCount;
 }
 
 void Server::sendMsg(QString msg) {
@@ -96,8 +111,10 @@ void Server::sendMsg(QString msg) {
   } else {
       client->sendTextMessage(msg);
 
-      if (currentPhase == phases.size() - 2) {
+      if (currentPhase >= phases.size() - 2) {
           file.close();
+          server->disconnect();
+          client->close();
           serialWrite("dd if=/dev/zero of=/dev/fb0\n");
       }
   }
@@ -137,4 +154,3 @@ std::string Server::getServerAddress() {
              ? socket.localAddress().toString().toStdString()
              : "localhost";
 }
-
