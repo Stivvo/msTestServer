@@ -17,7 +17,6 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
   this->lblEvent = lblEvent;
   this->lblNtested = lblNtested;
 
-  usbRemoved = true;
   usbTestedCount = 0;
   usbCount = 4;
 
@@ -87,13 +86,10 @@ void Server::processMsg(QString msg) {
 
     if (msg.contains("usb")) {
         lblEvent->setText(msg);
-        if (msg == "usb added" && usbRemoved) {
+        if (msg == "usb added") {
             usbTestedCount++;
-            usbRemoved = false;
             lblNtested->setText(QString("tested: %1/%2").arg(usbTestedCount / 1).arg(usbCount));
-        } else if (msg == "usb removed")
-            usbRemoved = true;
-
+        }
         showLabels(true);
     } else if (msg == "button pressed") {
         btnPressedCount++;

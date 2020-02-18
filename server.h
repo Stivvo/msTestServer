@@ -34,7 +34,6 @@ private:
   int currentPhase;
   std::ofstream file;
 
-  bool usbRemoved;
   int usbTestedCount;
   int usbCount;
 
