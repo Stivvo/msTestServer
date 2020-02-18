@@ -33,6 +33,8 @@ add_executable(msTestServer
   mainwindow.ui
   server.h
   server.cpp
+  phases.h
+  phases.cpp
 )
 
 target_link_libraries(msTestServer PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::SerialPort Qt5::WebSockets)

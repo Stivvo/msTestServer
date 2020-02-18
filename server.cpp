@@ -155,3 +155,7 @@ std::string Server::getServerAddress() {
              ? socket.localAddress().toString().toStdString()
              : "localhost";
 }
+
+void Server::parse(QString filename) {
+
+}

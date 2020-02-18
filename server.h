@@ -11,7 +11,7 @@
 #include <QtCore/QObject>
 #include <QtWebSockets/QtWebSockets>
 #include <iostream>
-#include <vector>
+#include "phases.h"
 #include <fstream>
 
 class Server : public QObject {
@@ -43,6 +43,9 @@ private:
   QLabel *lbl;
   QLabel *lblEvent;
   QLabel *lblNtested;
+
+  void parse(QString filename);
+
 
 private Q_SLOTS:
   void onNewConnection();
