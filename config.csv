@@ -1,12 +1,12 @@
 start;on
-touch;on;12
+touch;off;12
 brightness;on;7
 turnoffScreen;on
-usb;on;4
+usb;off;4
 red;on
-green;on
+green;off
 blue;on
 black;on
 white;on
-end;on
+end;off
 finished;on

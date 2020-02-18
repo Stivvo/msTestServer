@@ -25,6 +25,8 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
   lbl->setText("press a button to start");
   lbl->update();
   lbl->repaint();
+
+  parse("../msTestServer/config.csv");
 }
 
 Server::~Server() {
@@ -32,6 +34,7 @@ Server::~Server() {
     server->disconnect();
     client->close();
 }
+
 
 void Server::onNewConnection() {
   client = server->nextPendingConnection();
@@ -152,11 +155,15 @@ std::string Server::getServerAddress() {
 
 void Server::parse(QString qfilename) {
     std::ifstream file;
-    file.open(qfilename.toStdString());
+    file.open(qfilename.toStdString(), std::ios::in);
     std::string line;
 
-    while (file >> line) {
+    int i = 0;
 
+    while (file >> line && i < 12) {
+        qDebug() << "parsing: " << QString::fromStdString(line);
+        phases.parseLine(line);
+        ++i;
     }
 }
 

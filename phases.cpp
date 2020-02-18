@@ -3,10 +3,8 @@
 Phases::Phases() {
     names = {"start", "touch", "brightness", "turnoffScreen", "usb", "red", "green", "blue", "black", "white", "end"};
     values.reserve(names.size());
-    for(std::pair<bool, int> value : values) {
-        value.first = false;
-        value.second = 0;
-    }
+    for(int i = 0; i < names.size(); ++i)
+        values.emplace_back(std::make_pair(false, 0));
     current = -1; // phase -1 is "press a button to start"
 }
 
@@ -36,9 +34,12 @@ bool Phases::add(std::string nameStd, bool enabled, int number) {
     QString name = QString::fromStdString(nameStd); // costava tanto a qt fare un costruttore con parametri per qstring che prendeva std::string
     while (i < names.size() && !ret) {
         if (names.at(i) == name) {
+            qDebug() << "adding: " << QString::fromStdString(nameStd) << ", enabled: " << enabled << ", number: " << number;
             ret = true;
             values.at(i) = std::make_pair(enabled, number);
+            qDebug() << "found in " << i;
         }
+        ++i;
     }
     return ret;
 }
@@ -52,10 +53,13 @@ bool Phases::parseLine(std::string line) {
     int number = 0;
 
     while (std::getline(buffer, temp, ';')) {
+        qDebug() << "column: " << QString::fromStdString(temp);
         if (temp == "on")
             enabled = true;
+        else if (temp == "off")
+            enabled = false;
         else if (is_number(temp))
-            number = std::stoi(line);
+            number = std::stoi(temp);
         else
             name = temp;
     }
