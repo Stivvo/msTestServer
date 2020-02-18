@@ -12,7 +12,7 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
     qDebug() << "NOT ";
   }
   qDebug() << "listening for client on 8080\n";
-  phases = {"start", "touch", "brightness", "turnoffScreen", "usb", "red", "green", "blue", "black", "white", "end", "finished"};
+  phases = {"start", "touch", "brightness", "turnoffScreen", "usb", "red", "green", "blue", "black", "white", "end"};
   this->lbl = lbl;
   this->lblEvent = lblEvent;
   this->lblNtested = lblNtested;
@@ -48,7 +48,7 @@ void Server::onNewConnection() {
 
 void Server::sendMsg(QString msg) {
 
-    if (currentPhase >= phases.size() - 1 && currentPhase != -1)
+    if (currentPhase >= phases.size() && currentPhase != -1)
         return;
 
     showLabels(false);
@@ -71,7 +71,7 @@ void Server::sendMsg(QString msg) {
       //  serialWrite("ifconfig eth0 192.168.0.1 255.255.255.0"); // from gui
   } else {
         client->sendTextMessage(msg);
-      if (currentPhase == phases.size() - 2) {
+      if (currentPhase == phases.size() - 1) {
           serialWrite("dd if=/dev/zero of=/dev/fb0\n");
       }
   }
@@ -112,17 +112,16 @@ void Server::advance(QString msg) {
     if (currentPhase == -1) {
         currentPhase++;
         lbl->setText(phases.at(currentPhase));
-        lbl->repaint();
+    } else if (currentPhase >= phases.size() -1) {
+        lbl->setText("finished");
     } else {
-        if (currentPhase < phases.size() - 1) {
-            file << phases.at(currentPhase).toStdString() << " " << msg.toStdString() << std::endl;
-            // the name of the test written on the log file is the one that has just finished (after pressing a button or board message)
-            currentPhase++;
-            lbl->setText(phases.at(currentPhase));
-            lbl->repaint();
-            // the name of the test written on the label is the one that still has to pass/fail
-        }
+        file << phases.at(currentPhase).toStdString() << " " << msg.toStdString() << std::endl;
+        // the name of the test written on the log file is the one that has just finished (after pressing a button or board message)
+        currentPhase++;
+        lbl->setText(phases.at(currentPhase));
+        // the name of the test written on the label is the one that still has to pass/fail
     }
+    lbl->repaint();
 }
 
 void Server::serialWrite(std::string cmd) {
