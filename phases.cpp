@@ -2,6 +2,11 @@
 
 Phases::Phases() {
     names = {"start", "touch", "brightness", "turnoffScreen", "usb", "red", "green", "blue", "black", "white", "end"};
+    values.reserve(names.size());
+    for(std::pair<bool, int> value : values) {
+        value.first = false;
+        value.second = 0;
+    }
     current = -1; // phase -1 is "press a button to start"
 }
 
@@ -36,6 +41,31 @@ bool Phases::add(std::string nameStd, bool enabled, int number) {
         }
     }
     return ret;
+}
+
+bool Phases::parseLine(std::string line) {
+    std::istringstream buffer(line);
+
+    std::string temp;
+    std::string name;
+    bool enabled = false;
+    int number = 0;
+
+    while (std::getline(buffer, temp, ';')) {
+        if (temp == "on")
+            enabled = true;
+        else if (is_number(temp))
+            number = std::stoi(line);
+        else
+            name = temp;
+    }
+    this->add(name, enabled, number);
+}
+
+bool Phases::is_number(const std::string& s)
+{
+    return !s.empty() && std::find_if(s.begin(),
+        s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
 
 QString Phases::currentName() {

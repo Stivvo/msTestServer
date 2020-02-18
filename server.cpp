@@ -150,6 +150,13 @@ std::string Server::getServerAddress() {
              : "localhost";
 }
 
-void Server::parse(QString filename) {
+void Server::parse(QString qfilename) {
+    std::ifstream file;
+    file.open(qfilename.toStdString());
+    std::string line;
 
+    while (file >> line) {
+
+    }
 }
+

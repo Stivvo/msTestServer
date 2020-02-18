@@ -3,9 +3,11 @@
 
 #include <iostream>
 #include <vector>
-#include <vector>
 #include <utility>
 #include <QString>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 class Phases
 {
@@ -13,6 +15,7 @@ public:
     Phases();
     ~Phases() = default;
     bool add(std::string name, bool enabled, int number); // return false if name doesn't exists
+    bool parseLine(std::string line);
 
     bool advance();
     int getCurrent() {return current;}
@@ -24,6 +27,7 @@ public:
     QString currentName();
     bool currentEnabled();
     int currentNumber();
+    bool is_number(const std::string& s);
 private:
     std::vector<QString> names;
     std::vector<std::pair<bool, int>> values;

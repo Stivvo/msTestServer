@@ -12,6 +12,8 @@
 #include <QtWebSockets/QtWebSockets>
 #include "phases.h"
 #include <fstream>
+#include <sstream>
+#include <string>
 
 class Server : public QObject {
 public:
@@ -43,6 +45,7 @@ private:
   QLabel *lblNtested;
 
   void parse(QString filename);
+  std::list<std::string> explode(std::string input, char sep);
 
 private Q_SLOTS:
   void onNewConnection();
