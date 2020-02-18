@@ -1,7 +1,7 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include "server.h"
+#include <iostream>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QHBoxLayout>
@@ -10,7 +10,6 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QtCore/QObject>
-#include <iostream>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,15 +17,15 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow {
-  Q_OBJECT
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
 
 public:
-  MainWindow(QWidget *parent = nullptr);
-  ~MainWindow();
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
 private:
-  Ui::MainWindow *ui;
-  Server *server;
+    Ui::MainWindow *ui;
+    Server *server;
 };
-#endif // MAINWINDOW_H

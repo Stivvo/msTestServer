@@ -1,14 +1,13 @@
-#ifndef PHASES_H
-#define PHASES_H
+#pragma once
 
-#include <iostream>
-#include <vector>
-#include <utility>
-#include <QString>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
 #include <QDebug>
+#include <QString>
 
 class Phases
 {
@@ -19,8 +18,8 @@ public:
     bool parseLine(std::string line);
 
     bool advance();
-    int getCurrent() {return current;}
-    int size() {return names.size();}
+    int getCurrent() { return current; }
+    int size() { return names.size(); }
     bool isLast();
     bool finished();
     bool isFirst();
@@ -28,11 +27,10 @@ public:
     QString currentName();
     bool currentEnabled();
     int currentNumber();
-    bool is_number(const std::string& s);
+    bool is_number(const std::string &s);
+
 private:
     std::vector<QString> names;
     std::vector<std::pair<bool, int>> values;
     int current;
 };
-
-#endif // PHASES_H

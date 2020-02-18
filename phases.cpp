@@ -1,14 +1,26 @@
 #include "phases.h"
 
-Phases::Phases() {
-    names = {"start", "touch", "brightness", "turnoffScreen", "usb", "red", "green", "blue", "black", "white", "end"};
+Phases::Phases()
+{
+    names = {"start",
+             "touch",
+             "brightness",
+             "turnoffScreen",
+             "usb",
+             "red",
+             "green",
+             "blue",
+             "black",
+             "white",
+             "end"};
     values.reserve(names.size());
-    for(int i = 0; i < names.size(); ++i)
+    for (int i = 0; i < names.size(); ++i)
         values.emplace_back(std::make_pair(false, 0));
     current = -1; // phase -1 is "press a button to start"
 }
 
-bool Phases::advance() {
+bool Phases::advance()
+{
     if (current < names.size() || current == -1) {
         current++;
         return true;
@@ -16,25 +28,31 @@ bool Phases::advance() {
     return false;
 }
 
-bool Phases::isLast() {
+bool Phases::isLast()
+{
     return current == this->size() - 1;
 }
 
-bool Phases::finished() {
+bool Phases::finished()
+{
     return current == this->size();
 }
 
-bool Phases::isFirst() {
+bool Phases::isFirst()
+{
     return current == -1;
 }
 
-bool Phases::add(std::string nameStd, bool enabled, int number) {
+bool Phases::add(std::string nameStd, bool enabled, int number)
+{
     bool ret = false;
     int i = 0;
-    QString name = QString::fromStdString(nameStd); // costava tanto a qt fare un costruttore con parametri per qstring che prendeva std::string
+    QString name = QString::fromStdString(
+        nameStd); // costava tanto a qt fare un costruttore con parametri per qstring che prendeva std::string
     while (i < names.size() && !ret) {
         if (names.at(i) == name) {
-            qDebug() << "adding: " << QString::fromStdString(nameStd) << ", enabled: " << enabled << ", number: " << number;
+            qDebug() << "adding: " << QString::fromStdString(nameStd) << ", enabled: " << enabled
+                     << ", number: " << number;
             ret = true;
             values.at(i) = std::make_pair(enabled, number);
             qDebug() << "found in " << i;
@@ -44,7 +62,8 @@ bool Phases::add(std::string nameStd, bool enabled, int number) {
     return ret;
 }
 
-bool Phases::parseLine(std::string line) {
+bool Phases::parseLine(std::string line)
+{
     std::istringstream buffer(line);
 
     std::string temp;
@@ -66,20 +85,24 @@ bool Phases::parseLine(std::string line) {
     this->add(name, enabled, number);
 }
 
-bool Phases::is_number(const std::string& s)
+bool Phases::is_number(const std::string &s)
 {
-    return !s.empty() && std::find_if(s.begin(),
-        s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
+    return !s.empty() && std::find_if(s.begin(), s.end(), [](unsigned char c) {
+                             return !std::isdigit(c);
+                         }) == s.end();
 }
 
-QString Phases::currentName() {
+QString Phases::currentName()
+{
     return names.at(current);
 }
 
-bool Phases::currentEnabled() {
+bool Phases::currentEnabled()
+{
     return values.at(current).first;
 }
 
-int Phases::currentNumber() {
+int Phases::currentNumber()
+{
     return values.at(current).second;
 }
