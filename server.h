@@ -10,7 +10,6 @@
 #include <QString>
 #include <QtCore/QObject>
 #include <QtWebSockets/QtWebSockets>
-#include <iostream>
 #include "phases.h"
 #include <fstream>
 
@@ -30,8 +29,7 @@ private:
   QWebSocketServer *server;
   QWebSocket *client;
 
-  std::vector<QString> phases;
-  int currentPhase;
+  Phases phases;
   std::ofstream file;
 
   int usbTestedCount;
@@ -45,7 +43,6 @@ private:
   QLabel *lblNtested;
 
   void parse(QString filename);
-
 
 private Q_SLOTS:
   void onNewConnection();

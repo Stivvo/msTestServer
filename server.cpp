@@ -12,7 +12,6 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
     qDebug() << "NOT ";
   }
   qDebug() << "listening for client on 8080\n";
-  phases = {"start", "touch", "brightness", "turnoffScreen", "usb", "red", "green", "blue", "black", "white", "end"};
   this->lbl = lbl;
   this->lblEvent = lblEvent;
   this->lblNtested = lblNtested;
@@ -23,7 +22,6 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested) {
   btnPressedCount = 0;
   btnCount = 12;
 
-  currentPhase = -1; // phase -1 is "press a button to start"
   lbl->setText("press a button to start");
   lbl->update();
   lbl->repaint();
@@ -48,7 +46,7 @@ void Server::onNewConnection() {
 
 void Server::sendMsg(QString msg) {
 
-    if (currentPhase >= phases.size() && currentPhase != -1)
+    if (phases.finished())
         return;
 
     showLabels(false);
@@ -56,7 +54,7 @@ void Server::sendMsg(QString msg) {
   // può cambiare il normale ordine, se ad esempio clicco tutti i bottoni
   // currentphase va avanti e il client fa fare l'avanzamento di fase sul server
 
-  if (currentPhase == -1) { // la prima volta non invia nulla al client ma lo fa partire
+  if (phases.isFirst()) { // la prima volta non invia nulla al client ma lo fa partire
       file.open("/tmp/msTest/" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss").toStdString() + ".txt");
 
       serialWrite("killall msTest\n");
@@ -71,16 +69,15 @@ void Server::sendMsg(QString msg) {
       //  serialWrite("ifconfig eth0 192.168.0.1 255.255.255.0"); // from gui
   } else {
         client->sendTextMessage(msg);
-      if (currentPhase == phases.size() - 1) {
+      if (phases.isLast())
           serialWrite("dd if=/dev/zero of=/dev/fb0\n");
-      }
   }
   advance(msg);
 }
 
 void Server::processMsg(QString msg) {
     qDebug() << "received" << msg;
-    qDebug() << "phase: " << phases.at(currentPhase);
+    qDebug() << "phase: " << phases.currentName();
 
     if (msg.contains("usb")) {
         lblEvent->setText(msg);
@@ -109,18 +106,15 @@ void Server::showLabels(bool visible) {
 
 void Server::advance(QString msg) {
 
-    if (currentPhase == -1) {
-        currentPhase++;
-        lbl->setText(phases.at(currentPhase));
-    } else if (currentPhase >= phases.size() -1) {
-        lbl->setText("finished");
-    } else {
-        file << phases.at(currentPhase).toStdString() << " " << msg.toStdString() << std::endl;
+    if (!phases.isFirst())
+        file << phases.currentName().toStdString() << " " << msg.toStdString() << std::endl;
         // the name of the test written on the log file is the one that has just finished (after pressing a button or board message)
-        currentPhase++;
-        lbl->setText(phases.at(currentPhase));
-        // the name of the test written on the label is the one that still has to pass/fail
-    }
+    phases.advance();
+    if (phases.finished())
+        lbl->setText("finished");
+    else
+        lbl->setText(phases.currentName());
+    // the name of the test written on the label is the one that still has to pass/fail
     lbl->repaint();
 }
 
