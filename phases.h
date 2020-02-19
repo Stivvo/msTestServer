@@ -17,7 +17,6 @@ public:
     bool parseLine(std::string line);
 
     bool advance();
-    int getCurrent() { return current; }
     int size() { return names.size(); }
     bool isLast();
     bool finished();
@@ -30,7 +29,7 @@ public:
     void print();
 
 private:
-    std::vector<QString> names;
+    static const std::vector<QString> names;
     std::vector<std::pair<bool, int>> values;
     int current;
 };

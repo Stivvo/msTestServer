@@ -12,17 +12,12 @@
 
 class Server : public QObject
 {
+    Q_OBJECT
 public:
     Server(QLabel *lbl, QLabel *lblUsb, QLabel *lblUsbTested);
     ~Server();
 
     std::string getServerAddress();
-    void sendMsg(QString msg);
-    void checkEnabled(QString msg);
-
-    void serialWrite(std::string);
-    void advance(QString msg);
-    void showLabels(bool visible);
 
 private:
     QWebSocketServer *server;
@@ -39,8 +34,20 @@ private:
     QLabel *lblNtested;
 
     void parse(QString filename);
+    void showLabels(bool visible);
+
+    void advance(QString msg);
+    void serialWrite(std::string);
+
+    void processMsg(QString msg);
+    void sendMsg(QString msg);
+    void checkEnabledSend(QString msg);
 
 private Q_SLOTS:
+    void checkEnabledProces(QString msg);
     void onNewConnection();
-    void processMsg(QString msg);
+public Q_SLOTS:
+    void passTest() { checkEnabledSend("passed"); }
+    void failTest() { checkEnabledSend("failed"); }
+    void skipTest() { checkEnabledSend("skipped"); }
 };

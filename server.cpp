@@ -28,7 +28,6 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested)
 Server::~Server()
 {
     file.close();
-    client->close();
     server->disconnect();
 }
 
@@ -37,18 +36,26 @@ void Server::onNewConnection()
     client = server->nextPendingConnection();
     qDebug() << client->errorString();
 
-    connect(client, &QWebSocket::textMessageReceived, this, &Server::processMsg);
+    connect(client, &QWebSocket::textMessageReceived, this, &Server::checkEnabledProces);
     connect(client, &QWebSocket::disconnected, this, [this]() {
         qDebug() << "client disconnected";
+        client->close();
         client->deleteLater();
     });
 }
 
-void Server::checkEnabled(QString msg)
+void Server::checkEnabledSend(QString msg)
 {
     sendMsg(msg);
-    if (!phases.currentEnabled())
+    while (!phases.currentEnabled())
         sendMsg("skipped");
+}
+
+void Server::checkEnabledProces(QString msg)
+{
+    processMsg(msg);
+    while (!phases.currentEnabled())
+        processMsg("skipped");
 }
 
 void Server::sendMsg(QString msg)

@@ -1,32 +1,29 @@
 #include "phases.h"
 
+const std::vector<QString> Phases::names = {"start",
+                                            "touch",
+                                            "brightness",
+                                            "turnoffScreen",
+                                            "usb",
+                                            "red",
+                                            "green",
+                                            "blue",
+                                            "black",
+                                            "white",
+                                            "end"};
+
 Phases::Phases()
 {
-    names = {"start",
-             "touch",
-             "brightness",
-             "turnoffScreen",
-             "usb",
-             "red",
-             "green",
-             "blue",
-             "black",
-             "white",
-             "end"};
     values.reserve(names.size());
-    for (int i = 0; i < names.size(); ++i)
+    for (unsigned long i = 0; i < names.size(); ++i)
         values.emplace_back(std::make_pair(false, 0));
     current = -1; // phase -1 is "press a button to start"
 }
 
 bool Phases::advance()
 {
-    if (current == -1) {
+    if (current < static_cast<int>(names.size()) || current == -1) {
         ++current;
-        return true;
-    }
-    if (current < names.size()) {
-        current++;
         return true;
     }
     return false;
@@ -49,14 +46,14 @@ bool Phases::isFirst()
 
 void Phases::print()
 {
-    for (int i = 0; i < names.size(); ++i)
+    for (unsigned long i = 0; i < names.size(); ++i)
         qDebug() << names.at(i) << ", " << values.at(i).first << ", " << values.at(i).second;
 }
 
 bool Phases::add(std::string nameStd, bool enabled, int number)
 {
     bool ret = false;
-    int i = 0;
+    unsigned long i = 0;
     QString name = QString::fromStdString(
         nameStd); // costava tanto a qt fare un costruttore con parametri per qstring che prendeva std::string
     while (i < names.size() && !ret) {
@@ -92,7 +89,7 @@ bool Phases::parseLine(std::string line)
         else
             name = temp;
     }
-    this->add(name, enabled, number);
+    return this->add(name, enabled, number);
 }
 
 bool Phases::is_number(const std::string &s)
