@@ -24,22 +24,22 @@ MainWindow::MainWindow(QWidget *parent)
 
     QPushButton *btnPrev = new QPushButton(this);
     btnPrev->setText("go back");
-    connect(btnPrev, &QPushButton::released, this, [this]() { server->sendMsg("passed"); });
+    connect(btnPrev, &QPushButton::released, this, [this]() { server->checkEnabled("passed"); });
     btnRow->addWidget(btnPrev);
 
     QPushButton *btnPass = new QPushButton(this);
     btnPass->setText("passed");
-    connect(btnPass, &QPushButton::released, this, [this]() { server->sendMsg("passed"); });
+    connect(btnPass, &QPushButton::released, this, [this]() { server->checkEnabled("passed"); });
     btnRow->addWidget(btnPass);
 
     QPushButton *btnSkip = new QPushButton(this);
     btnSkip->setText("skip");
-    connect(btnSkip, &QPushButton::released, this, [this]() { server->sendMsg("skipped"); });
+    connect(btnSkip, &QPushButton::released, this, [this]() { server->checkEnabled("skipped"); });
     btnRow->addWidget(btnSkip);
 
     QPushButton *btnFail = new QPushButton(this);
     btnFail->setText("failed");
-    connect(btnFail, &QPushButton::released, this, [this]() { server->sendMsg("failed"); });
+    connect(btnFail, &QPushButton::released, this, [this]() { server->checkEnabled("failed"); });
     btnRow->addWidget(btnFail);
 
     col->addItem(lblRow);

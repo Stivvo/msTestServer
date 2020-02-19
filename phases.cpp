@@ -21,7 +21,11 @@ Phases::Phases()
 
 bool Phases::advance()
 {
-    if (current < names.size() || current == -1) {
+    if (current == -1) {
+        ++current;
+        return true;
+    }
+    if (current < names.size()) {
         current++;
         return true;
     }
@@ -41,6 +45,11 @@ bool Phases::finished()
 bool Phases::isFirst()
 {
     return current == -1;
+}
+
+void Phases::print() {
+    for (int i = 0; i < names.size(); ++i)
+        qDebug() << names.at(i) << ", " << values.at(i).first << ", " << values.at(i).second;
 }
 
 bool Phases::add(std::string nameStd, bool enabled, int number)
@@ -99,6 +108,8 @@ QString Phases::currentName()
 
 bool Phases::currentEnabled()
 {
+    if (this->finished())
+        return true;
     return values.at(current).first;
 }
 

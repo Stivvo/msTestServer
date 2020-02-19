@@ -3,14 +3,11 @@
 #include "phases.h"
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QLabel>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QSerialPort>
-#include <QString>
 #include <QtCore/QObject>
 #include <QtWebSockets/QtWebSockets>
 
@@ -22,6 +19,7 @@ public:
 
     std::string getServerAddress();
     void sendMsg(QString msg);
+    void checkEnabled(QString msg);
 
     void serialWrite(std::string);
     void advance(QString msg);
@@ -35,10 +33,7 @@ private:
     std::ofstream file;
 
     int usbTestedCount;
-    int usbCount;
-
     int btnPressedCount;
-    int btnCount;
 
     QLabel *lbl;
     QLabel *lblEvent;

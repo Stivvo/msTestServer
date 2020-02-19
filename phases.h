@@ -28,6 +28,7 @@ public:
     bool currentEnabled();
     int currentNumber();
     bool is_number(const std::string &s);
+    void print();
 
 private:
     std::vector<QString> names;
