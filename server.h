@@ -1,8 +1,5 @@
 #pragma once
 
-#include "phases.h"
-#include <fstream>
-#include <sstream>
 #include <QCoreApplication>
 #include <QLabel>
 #include <QMainWindow>
@@ -10,6 +7,8 @@
 #include <QSerialPort>
 #include <QtCore/QObject>
 #include <QtWebSockets/QtWebSockets>
+
+#include "phases.h"
 
 class Server : public QObject
 {

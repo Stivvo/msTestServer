@@ -44,7 +44,8 @@ void Server::onNewConnection()
     });
 }
 
-void Server::checkEnabled(QString msg) {
+void Server::checkEnabled(QString msg)
+{
     sendMsg(msg);
     if (!phases.currentEnabled())
         sendMsg("skipped");
@@ -90,13 +91,15 @@ void Server::processMsg(QString msg)
         lblEvent->setText(msg);
         if (msg == "usb added") {
             usbTestedCount++;
-            lblNtested->setText(QString("tested: %1/%2").arg(usbTestedCount).arg(phases.currentNumber()));
+            lblNtested->setText(
+                QString("tested: %1/%2").arg(usbTestedCount).arg(phases.currentNumber()));
         }
         showLabels(true);
     } else if (msg == "button pressed") {
         btnPressedCount++;
         lblEvent->setText(msg);
-        lblNtested->setText(QString("pressed: %1/%2").arg(btnPressedCount).arg(phases.currentNumber()));
+        lblNtested->setText(
+            QString("pressed: %1/%2").arg(btnPressedCount).arg(phases.currentNumber()));
         showLabels(true);
     } else {
         showLabels(false);

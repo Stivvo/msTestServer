@@ -1,15 +1,9 @@
 #pragma once
 
-#include "server.h"
-#include <iostream>
-#include <QCoreApplication>
-#include <QDateTime>
 #include <QHBoxLayout>
-#include <QLabel>
-#include <QMainWindow>
-#include <QPushButton>
 #include <QVBoxLayout>
-#include <QtCore/QObject>
+
+#include "server.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

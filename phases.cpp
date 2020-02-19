@@ -47,7 +47,8 @@ bool Phases::isFirst()
     return current == -1;
 }
 
-void Phases::print() {
+void Phases::print()
+{
     for (int i = 0; i < names.size(); ++i)
         qDebug() << names.at(i) << ", " << values.at(i).first << ", " << values.at(i).second;
 }
