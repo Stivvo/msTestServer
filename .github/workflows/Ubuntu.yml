@@ -1,0 +1,22 @@
+name: Ubuntu
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2  
+      with:
+        version: 5.14.1
+    - uses: actions/checkout@v2
+    - name: cmake
+      run: |
+        mkdir build
+        cd build
+        cmake ../
+    - name: make
+      run: make -j8
