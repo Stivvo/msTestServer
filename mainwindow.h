@@ -21,5 +21,5 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Server *server;
+    std::unique_ptr<Server> server;
 };

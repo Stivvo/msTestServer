@@ -20,8 +20,8 @@ public:
     std::string getServerAddress();
 
 private:
-    QWebSocketServer *server;
-    QWebSocket *client;
+    std::unique_ptr<QWebSocketServer> server;
+    std::unique_ptr<QWebSocket> client;
 
     Phases phases;
     std::ofstream file;
@@ -29,9 +29,9 @@ private:
     int usbTestedCount;
     int btnPressedCount;
 
-    QLabel *lbl;
-    QLabel *lblEvent;
-    QLabel *lblNtested;
+    std::unique_ptr<QLabel> lbl;
+    std::unique_ptr<QLabel> lblEvent;
+    std::unique_ptr<QLabel> lblNtested;
 
     void parse(QString filename);
     void showLabels(bool visible);
@@ -46,6 +46,7 @@ private:
 private Q_SLOTS:
     void checkEnabledProces(QString msg);
     void onNewConnection();
+
 public Q_SLOTS:
     void passTest() { checkEnabledSend("passed"); }
     void failTest() { checkEnabledSend("failed"); }

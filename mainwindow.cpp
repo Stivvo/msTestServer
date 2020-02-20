@@ -45,11 +45,11 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCentralWidget(ui->centralwidget);
     ui->centralwidget->show();
 
-    server = new Server(lblNameTest, lblEvent, lblNtested);
-    connect(btnFail, &QPushButton::released, server, &Server::failTest);
-    connect(btnSkip, &QPushButton::released, server, &Server::skipTest);
-    connect(btnPass, &QPushButton::released, server, &Server::passTest);
-    connect(btnPrev, &QPushButton::released, server, &Server::passTest);
+    server.reset(new Server(lblNameTest, lblEvent, lblNtested));
+    connect(btnFail, &QPushButton::released, server.get(), &Server::failTest);
+    connect(btnSkip, &QPushButton::released, server.get(), &Server::skipTest);
+    connect(btnPass, &QPushButton::released, server.get(), &Server::passTest);
+    connect(btnPrev, &QPushButton::released, server.get(), &Server::passTest);
 
     qDebug() << "starting server";
 }

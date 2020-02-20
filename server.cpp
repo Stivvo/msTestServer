@@ -2,24 +2,23 @@
 
 Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested)
 {
-    server = new QWebSocketServer(QString("msTestServer"), QWebSocketServer::NonSecureMode);
+    server.reset(new QWebSocketServer(QString("msTestServer"), QWebSocketServer::NonSecureMode));
 
     if (server->listen(QHostAddress::Any, 8080)) {
-        connect(server, &QWebSocketServer::newConnection, this, &Server::onNewConnection);
+        connect(server.get(), &QWebSocketServer::newConnection, this, &Server::onNewConnection);
         qDebug() << "starting server";
     } else {
         qDebug() << "NOT ";
     }
     qDebug() << "listening for client on 8080\n";
-    this->lbl = lbl;
-    this->lblEvent = lblEvent;
-    this->lblNtested = lblNtested;
+    this->lbl.reset(lbl);
+    this->lblEvent.reset(lblEvent);
+    this->lblNtested.reset(lblNtested);
 
     usbTestedCount = 0;
     btnPressedCount = 0;
 
     lbl->setText("press a button to start");
-    lbl->update();
     lbl->repaint();
 
     parse("../msTestServer/config.csv");
@@ -33,11 +32,11 @@ Server::~Server()
 
 void Server::onNewConnection()
 {
-    client = server->nextPendingConnection();
+    client.reset(server->nextPendingConnection());
     qDebug() << client->errorString();
 
-    connect(client, &QWebSocket::textMessageReceived, this, &Server::checkEnabledProces);
-    connect(client, &QWebSocket::disconnected, this, [this]() {
+    connect(client.get(), &QWebSocket::textMessageReceived, this, &Server::checkEnabledProces);
+    connect(client.get(), &QWebSocket::disconnected, this, [this]() {
         qDebug() << "client disconnected";
         client->close();
         client->deleteLater();
@@ -126,7 +125,8 @@ void Server::advance(QString msg)
 {
     if (!phases.isFirst())
         file << phases.currentName().toStdString() << " " << msg.toStdString() << std::endl;
-    // the name of the test written on the log file is the one that has just finished (after pressing a button or board message)
+    // the name of the test written on the log file is the one that has just finished
+    // (after pressing a button or board message)
     phases.advance();
     if (phases.finished())
         lbl->setText("finished");
