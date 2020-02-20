@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -50,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(btnSkip, &QPushButton::released, server.get(), &Server::skipTest);
     connect(btnPass, &QPushButton::released, server.get(), &Server::passTest);
     connect(btnPrev, &QPushButton::released, server.get(), &Server::passTest);
+    server->parse(QFileDialog::getOpenFileName(this, tr("Open config"), tr("CSV files (*.csv)")));
 
     qDebug() << "starting server";
 }

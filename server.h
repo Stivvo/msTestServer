@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <QCoreApplication>
 #include <QLabel>
 #include <QMainWindow>
@@ -18,6 +19,7 @@ public:
     ~Server();
 
     std::string getServerAddress();
+    void parse(const QString &filename);
 
 private:
     std::unique_ptr<QWebSocketServer> server;
@@ -33,7 +35,6 @@ private:
     std::unique_ptr<QLabel> lblEvent;
     std::unique_ptr<QLabel> lblNtested;
 
-    void parse(QString filename);
     void showLabels(bool visible);
 
     void advance(QString msg);

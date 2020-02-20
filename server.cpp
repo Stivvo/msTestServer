@@ -20,14 +20,13 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested)
 
     lbl->setText("press a button to start");
     lbl->repaint();
-
-    parse("../msTestServer/config.csv");
 }
 
 Server::~Server()
 {
     file.close();
     server->disconnect();
+    //    delete somepointer;
 }
 
 void Server::onNewConnection()
@@ -168,7 +167,7 @@ std::string Server::getServerAddress()
     return socket.waitForConnected() ? socket.localAddress().toString().toStdString() : "localhost";
 }
 
-void Server::parse(QString qfilename)
+void Server::parse(const QString &qfilename)
 {
     std::ifstream file;
     file.open(qfilename.toStdString(), std::ios::in);
