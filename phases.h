@@ -30,14 +30,18 @@ public:
     bool currentEnabled();
     QString currentName();
 
+    int getBaud() { return baud; }
+    QString getPort() { return port; }
+    std::string getIp() { return ip; }
+
 private:
     static const std::vector<QString> names;
     std::vector<std::pair<bool, int>> values;
     int current;
 
-    QString portName;
-    QString ip;
-    int baudrate;
+    QString port;
+    std::string ip;
+    int baud;
 
     bool validBaudrate(std::string s);
     bool validIp(std::string s);

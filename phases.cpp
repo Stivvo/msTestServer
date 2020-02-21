@@ -20,9 +20,9 @@ Phases::Phases()
     for (unsigned long i = 0; i < names.size(); ++i)
         values.emplace_back(std::make_pair(false, 0));
     current = -1; // phase -1 is "press a button to start"
-    portName = "";
+    port = "";
     ip = "";
-    baudrate = -1;
+    baud = -1;
 }
 
 bool Phases::advance()
@@ -53,9 +53,9 @@ void Phases::print()
 {
     for (unsigned long i = 0; i < names.size(); ++i)
         qDebug() << names.at(i) << ", " << values.at(i).first << ", " << values.at(i).second;
-    qDebug() << "port: " << portName;
-    qDebug() << "baudrate: " << baudrate;
-    qDebug() << "ip: " << ip;
+    qDebug() << "port: " << port;
+    qDebug() << "baud: " << baud;
+    qDebug() << "ip: " << QString::fromStdString(ip);
 }
 
 bool Phases::add(std::string nameStd, bool enabled, int number)
@@ -94,18 +94,18 @@ bool Phases::parseLine(std::string line)
         else if (temp == "off") // disabled
             enabled = false;
         else if (validBaudrate(temp)) // baud
-            baudrate = std::stol(temp);
+            baud = std::stol(temp);
         else if (is_number(temp)) // number
             number = std::stoi(temp);
         else if (temp.find("/dev") != std::string::npos
                  || temp.find("com") != std::string::npos) // port
-            portName = QString::fromStdString(temp);
+            port = QString::fromStdString(temp);
         else if (validIp(temp)) // ip
-            ip = QString::fromStdString(temp);
+            ip = temp;
         else // name
             name = temp;
     }
-    if (name == "baud" && baudrate == -1) {
+    if (name == "baud" && baud == -1) {
         qDebug() << "invalid baud rate";
         return false;
     } else if (name == "ip" && ip == "") {
@@ -114,7 +114,7 @@ bool Phases::parseLine(std::string line)
     }
     return this->add(name, enabled, number);
 
-    // if the config contains an ip or a portname but "ip" or "port"
+    // if the config contains an ip or a port but "ip" or "port"
     // are spellt wrong their values are read anyway
 }
 

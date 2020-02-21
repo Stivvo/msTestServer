@@ -71,7 +71,8 @@ void Server::sendMsg(QString msg)
         serialWrite("date +%T -s " + QDateTime::currentDateTime().toString("hh:mm:ss").toStdString()
                     + "\n");
         serialWrite("/usr/bin/./msTest " + getServerAddress() + " & \n");
-        //  serialWrite("ifconfig eth0 192.168.0.1 255.255.255.0"); // from gui
+        if (!ip.empty())
+            serialWrite("ifconfig eth0 " + phases.getIp() + " 255.255.255.0"); // from gui
     } else {
         client->sendTextMessage(msg);
         if (phases.isLast()) {
@@ -131,18 +132,35 @@ void Server::advance(QString msg)
     lbl->repaint();
 }
 
+void Server::openSerialPort(QString port, int baud, std::string ip)
+{
+    qDebug() << "opening: port: " << port << ", baud: " << baud
+             << ", ip: " << QString::fromStdString(ip);
+    if (port.isEmpty())
+        serialPort.setPortName(phases.getPort());
+    else
+        serialPort.setPortName(port);
+
+    if (baud == -1)
+        serialPort.setBaudRate(phases.getBaud());
+    else
+        serialPort.setBaudRate(baud);
+
+    if (!ip.empty())
+        this->ip = ip;
+    else
+        this->ip = phases.getIp();
+
+    if (!serialPort.open(QIODevice::WriteOnly))
+        qDebug() << "cannot open the device";
+
+    this->ip = ip;
+}
+
 void Server::serialWrite(std::string cmd)
 {
     QByteArray writeData(cmd.c_str());
     std::cout << "writing: " << writeData.toStdString();
-
-    QSerialPort serialPort;
-    serialPort.setPortName("/dev/ttyUSB0");
-    serialPort.setBaudRate(QSerialPort::Baud115200);
-
-    qDebug() << "serial port: ";
-    if (!serialPort.open(QIODevice::WriteOnly))
-        qDebug() << "cannot open the device";
     const qint64 bytesWritten = serialPort.write(cmd.c_str());
 
     if (bytesWritten == -1)

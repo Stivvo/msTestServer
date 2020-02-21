@@ -20,10 +20,12 @@ public:
 
     std::string getServerAddress();
     void parse(const QString &filename);
+    void openSerialPort(QString port, int baud, std::string ip);
 
 private:
     std::unique_ptr<QWebSocketServer> server;
     std::unique_ptr<QWebSocket> client;
+    QSerialPort serialPort;
 
     Phases phases;
     std::ofstream file;
@@ -43,6 +45,8 @@ private:
     void processMsg(QString msg);
     void sendMsg(QString msg);
     void checkEnabledSend(QString msg);
+
+    std::string ip;
 
 private Q_SLOTS:
     void checkEnabledProces(QString msg);

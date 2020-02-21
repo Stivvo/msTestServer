@@ -1,6 +1,9 @@
 #pragma once
 
+#include <QComboBox>
+#include <QFileDialog>
 #include <QHBoxLayout>
+#include <QLineEdit>
 #include <QVBoxLayout>
 
 #include "server.h"
@@ -22,4 +25,5 @@ public:
 private:
     Ui::MainWindow *ui;
     std::unique_ptr<Server> server;
+    bool start;
 };
