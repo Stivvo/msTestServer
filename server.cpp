@@ -174,14 +174,17 @@ void Server::parse(const QString &qfilename)
         // remove spaces
         int i = 0, len = line.length();
         while (i < len) {
-            while (line[i] == ' ') {
+            while (line[i] == ' ' || line[i] == '\t') {
                 line.erase(i, 1);
                 --len;
             }
             ++i;
         }
-        qDebug() << "parsing: " << QString::fromStdString(line);
-        phases.parseLine(line);
+        std::string lowered;
+        for (char c : line)
+            lowered += c;
+        qDebug() << "parsing: " << QString::fromStdString(lowered);
+        phases.parseLine(lowered);
     }
     phases.print();
 }
