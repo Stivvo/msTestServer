@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2  
-      with:
-        version: 5.14.1
+    #- name: Install Qt
+      #uses: jurplel/install-qt-action@v2  
+     # with:
+      #  version: 5.14.1
     - uses: actions/checkout@v2
     - name: cmake
       run: |
