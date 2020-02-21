@@ -22,13 +22,6 @@ Server::Server(QLabel *lbl, QLabel *lblEvent, QLabel *lblNtested)
     lbl->repaint();
 }
 
-Server::~Server()
-{
-    file.close();
-    server->disconnect();
-    //    delete somepointer;
-}
-
 void Server::onNewConnection()
 {
     client.reset(server->nextPendingConnection());
@@ -81,8 +74,11 @@ void Server::sendMsg(QString msg)
         //  serialWrite("ifconfig eth0 192.168.0.1 255.255.255.0"); // from gui
     } else {
         client->sendTextMessage(msg);
-        if (phases.isLast())
+        if (phases.isLast()) {
             serialWrite("dd if=/dev/zero of=/dev/fb0\n");
+            file.close();
+            server->disconnect();
+        }
     }
     advance(msg);
 }
@@ -172,8 +168,18 @@ void Server::parse(const QString &qfilename)
     std::ifstream file;
     file.open(qfilename.toStdString(), std::ios::in);
     std::string line;
+    qDebug() << "here";
 
-    while (file >> line) {
+    while (getline(file, line)) {
+        // remove spaces
+        int i = 0, len = line.length();
+        while (i < len) {
+            while (line[i] == ' ') {
+                line.erase(i, 1);
+                --len;
+            }
+            ++i;
+        }
         qDebug() << "parsing: " << QString::fromStdString(line);
         phases.parseLine(line);
     }

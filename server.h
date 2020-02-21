@@ -16,7 +16,7 @@ class Server : public QObject
     Q_OBJECT
 public:
     Server(QLabel *lbl, QLabel *lblUsb, QLabel *lblUsbTested);
-    ~Server();
+    ~Server() = default;
 
     std::string getServerAddress();
     void parse(const QString &filename);

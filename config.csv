@@ -1,5 +1,5 @@
-start;on
-touch;on;12
+start;   on
+touch;   on;   12
 brightness;on;7
 turnoffScreen;on
 usb;on;2
@@ -9,3 +9,6 @@ black;on
 white;on
 end;on
 finished;on
+port;/dev/ttyUSB0
+baudrate;115200
+ip;192.168.0.128

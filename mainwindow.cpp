@@ -51,7 +51,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(btnSkip, &QPushButton::released, server.get(), &Server::skipTest);
     connect(btnPass, &QPushButton::released, server.get(), &Server::passTest);
     connect(btnPrev, &QPushButton::released, server.get(), &Server::passTest);
-    server->parse(QFileDialog::getOpenFileName(this, tr("Open config"), tr("CSV files (*.csv)")));
+    QFileDialog *configDialog = new QFileDialog(this, Qt::Dialog);
+    configDialog->setFilter(QDir::Files);
+    server->parse(
+        configDialog->getOpenFileName(this, tr("Open File"), QDir::homePath(), tr("csv (*.csv)")));
 
     qDebug() << "starting server";
 }
