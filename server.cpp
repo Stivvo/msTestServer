@@ -72,7 +72,7 @@ void Server::sendMsg(QString msg)
                     + "\n");
         serialWrite("/usr/bin/./msTest " + getServerAddress() + " & \n");
         if (!ip.empty())
-            serialWrite("ifconfig eth0 " + phases.getIp() + " 255.255.255.0"); // from gui
+            serialWrite("ifconfig eth0 " + phases.getIp() + " 255.255.255.0");
     } else {
         client->sendTextMessage(msg);
         if (phases.isLast()) {

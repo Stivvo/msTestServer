@@ -11,6 +11,7 @@ const std::vector<QString> Phases::names = {
     "blue",
     "black",
     "white",
+    "keyboard",
     "end",
 };
 
@@ -84,7 +85,7 @@ bool Phases::parseLine(std::string line)
 
     std::string temp;
     std::string name;
-    bool enabled = false;
+    bool enabled = true;
     int number = 0;
 
     while (std::getline(buffer, temp, ';')) {
