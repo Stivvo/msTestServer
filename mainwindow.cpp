@@ -27,12 +27,21 @@ MainWindow::MainWindow(QWidget *parent)
     lblRow->addWidget(lblNtested);
 
     // edit
+    QLabel *lblIp = new QLabel();
+    lblIp->setText("ip: ");
+    inputRow->addWidget(lblIp);
     QLineEdit *editIp = new QLineEdit();
     inputRow->addWidget(editIp);
 
+    QLabel *lblPort = new QLabel();
+    lblPort->setText("port name: ");
+    inputRow->addWidget(lblPort);
     QLineEdit *editPort = new QLineEdit();
     inputRow->addWidget(editPort);
 
+    QLabel *lblBaud = new QLabel();
+    lblBaud->setText("baudrate: ");
+    inputRow->addWidget(lblBaud);
     QComboBox *comboBaud = new QComboBox();
     comboBaud->addItems(
         {"nessuno", "1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"});
@@ -91,6 +100,13 @@ MainWindow::MainWindow(QWidget *parent)
             editIp->repaint();
             btnStart->setVisible(false);
             btnStart->repaint();
+
+            lblIp->setVisible(false);
+            lblIp->repaint();
+            lblPort->setVisible(false);
+            lblPort->repaint();
+            lblBaud->setVisible(false);
+            lblBaud->repaint();
 
             btnPass->setVisible(true);
             btnPass->repaint();
